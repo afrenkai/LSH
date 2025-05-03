@@ -3,8 +3,9 @@
 #include <math.h>
 #include <time.h>
 
-#define N_HASHES = 10;
-#define DIM = 5;
+#define DIM 5
+#define N_HASHES 10
+
 /*
 https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
 https://en.wikipedia.org/wiki/Locality-sensitive_hashing
@@ -26,7 +27,7 @@ double dot(const double *a, const double *b, int len) {
 
 void makeHyperplanes(double hplanes[N_HASHES][DIM]) {
     for (int i = 0; i < N_HASHES; ++i) {
-        for (int j  = 0; j < DIMS; ++j) {
+        for (int j  = 0; j < DIM; ++j) {
             hplanes[i][j] = stdNorm();
         }
     }
@@ -69,21 +70,21 @@ int main (int argc, char *argv[]) {
     double planes[N_HASHES][DIM];
     makeHyperplanes(planes);
 
-    double v1[DIMENSION] = {1.0, 0.0, 1.0, 0.0, 1.0};
-    double v2[DIMENSION] = {0.9, 0.1, 1.1, -0.1, 1.0};
-    double v3[DIMENSION] = {-1.0, -1.0, -1.0, -1.0, -1.0};
+    double v1[DIM] = {1.0, 0.0, 1.0, 0.0, 1.0};
+    double v2[DIM] = {0.9, 0.1, 1.1, -0.1, 1.0};
+    double v3[DIM] = {-1.0, -1.0, -1.0, -1.0, -1.0};
 
-    int h1[NUM_HASHES], h2[NUM_HASHES], h3[NUM_HASHES];
-    calcHash(v1, hyperplanes, h1);
-    calcHash(v2, hyperplanes, h2);
-    calcHash(v3, hyperplanes, h3);
+    int h1[N_HASHES], h2[N_HASHES], h3[N_HASHES];
+    calcHash(v1, planes, h1);
+    calcHash(v2, planes, h2);
+    calcHash(v3, planes, h3);
 
     printf("Hash 1: "); printHash(h1);
     printf("Hash 2: "); printHash(h2);
     printf("Hash 3: "); printHash(h3);
 
-    printf("Hamming distance (v1 vs v2): %d\n", hamming_distance(h1, h2));
-    printf("Hamming distance (v1 vs v3): %d\n", hamming_distance(h1, h3));
+    printf("Hamming distance (v1 vs v2): %d\n", hammingDistance(h1, h2));
+    printf("Hamming distance (v1 vs v3): %d\n", hammingDistance(h1, h3));
 
     return 0;
 }
