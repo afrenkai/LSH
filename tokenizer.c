@@ -6,7 +6,42 @@
 
 #define MAX_TOK 1000000
 
-TokenList tokenizeFile(const char* fname) {
+void initTokenDict(TokenDict* dict, char** items, int n_items) {
+	dict->max=512;
+	dict->size=0;
+	dict->item = malloc(dict->max * sizeof(TokenDictItem));
+
+	for (int i; i < n_items; i++) {
+		getAddToken(dict, items[i]);
+	}
+}
+
+int getAddToken(TokenDict* dict, const char* tok) {
+	for (int i = 0; i < dict->size; ++i) {
+		if (strcmp(dict->item[i].tok, tok) == 0) {
+			return dict->item[i].idx;
+		}
+	}
+	if (dict->size == dict->max) {
+		dict->max *= 2;
+		dict->item = realloc(dict->item, dict->max * sizeof(TokenDictItem));
+	} // case where the size is explicitly the same as the max, need to realloc
+	dict->item[dict->size].tok = strdup(tok);
+	dict->item[dict->size].idx = dict->size;
+	return dict->size++;
+}
+
+void freeTokenDict(TokenDict* dict) {
+	for (int i = 0; i < dict->size; ++i) {
+		free(dict->item[i].tok);
+	}
+	free(dict->item);
+}
+
+
+
+
+TokenList tokenizeFile(const char* fname, TokenDict* dict) {
 	FILE *fp = fopen(fname, "r");
 	if (!fp) {
 		perror("couldn't open file");
@@ -16,27 +51,49 @@ TokenList tokenizeFile(const char* fname) {
 	fseek(fp, 0, SEEK_END);
 	long size = ftell(fp);
 	rewind(fp);
+	
 	printf("reading file %s (size: %ld bytes)\n", fname, size);
+
+	char* buf = malloc(size+1);
+
+	fread(buf, 1, size, fp);
+	buf[size] = '\0';
+	fclose(fp);
 
 
 	
-	char **tok = malloc(MAX_TOK * sizeof(char*));
+	char **toks = malloc(MAX_TOK * sizeof(char*));
 	int cnt = 0;
-	int ch;
-
-	while (ch = fgetc(fp) != EOF && cnt < MAX_TOK) {
-		if (isprint(ch)) {
-		printf("read char: %c\n", ch);}
-		if (ch != EOF) {
-			tok[cnt] = malloc(2);
-			tok[cnt][0] = (char)ch;
-			tok[cnt][1]  = '\0';
-			cnt ++;
+	
+	char* p = buf;
+	while (*p) {
+		while (*p && isspace(*p)) {
+			p++;
 		}
-	}
-	fclose (fp);
+		if (*p == '\0') {
+			break;
+		}
 
-	TokenList list = {tok, cnt};
+		char tok[128];
+		int count = 0;
+
+		if (ispunct(*p)) {
+			tok[count++] = *p++;
+		}
+		else {
+			while(*p && (isalnum(*p) || *p == '_')) {
+				if (count < 127) {
+					tok[count++] = *p;
+				}
+				p++;
+			}
+		}
+		tok[count] = '\0';
+		toks[cnt++] = strdup(tok);
+		getAddToken(dict, tok);
+	}
+	free (buf);
+	TokenList list = {toks, cnt};
 	return list;
 }
 
@@ -54,17 +111,28 @@ void printTokens(TokenList list) {
 	printf("\n");
 }
 
-
-
-int main( int argc, char *argv[]) {
-	if (argc !=2) {
-		printf("Usage: %s file1.txt\n", argv[0]);
-		return 1;
-	}
-
-	TokenList tokens1 = tokenizeFile(argv[1]);
-	printf("Tokens from %s:\n", argv[1]);
-	printTokens(tokens1);
-	freeTokens(tokens1);
-	return 0;
+void printTokenDict(const TokenDict* dict) {
+    for (int i = 0; i < dict->size; ++i) {
+        printf("%s -> %d\n", dict->item[i].tok, dict->item[i].idx);
+    }
 }
+
+
+void saveTokenDictAsJSON(TokenDict* dict, const char* outname) {
+    FILE* out = fopen(outname, "w");
+    if (!out) {
+        perror("couldn't write token dict sum shi broke");
+        return;
+    }
+
+    fprintf(out, "{\n");
+    for (int i = 0; i < dict->size; ++i) {
+        fprintf(out, "  \"%s\": %d%s\n", 
+                dict->item[i].tok, 
+                dict->item[i].idx,
+                (i == dict->size - 1) ? "" : ","); // i lowkey forgot how ts works in c but i think it works like this in java
+    }
+    fprintf(out, "}\n");
+    fclose(out);
+}
+
