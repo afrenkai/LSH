@@ -11,7 +11,7 @@ void initTokenDict(TokenDict* dict, char** items, int n_items) {
 	dict->size=0;
 	dict->item = malloc(dict->max * sizeof(TokenDictItem));
 
-	for (int i; i < n_items; i++) {
+	for (int i = 0; i < n_items; i++) {
 		getAddToken(dict, items[i]);
 	}
 }
@@ -105,10 +105,11 @@ void freeTokens(TokenList list) {
 }
 
 void printTokens(TokenList list) {
+  printf("|");
 	for (int i = 0; i < list.cnt; ++i) {
-		printf("%s ", list.tok[i]);
+		printf("%s|", list.tok[i]);
 	}
-	printf("\n");
+	// printf("\n");
 }
 
 void printTokenDict(const TokenDict* dict) {

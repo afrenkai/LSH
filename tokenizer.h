@@ -20,8 +20,10 @@ typedef struct{
 void initTokenDict(TokenDict* dict, char** items, int n_items);
 int getAddToken(TokenDict* dict, const char* token);
 void freeTokenDict(TokenDict* dict);
-void saveTokensJSON(TokenDict* dict, const char* outname);
-
+void saveTokenDictAsJSON(TokenDict* dict, const char* outname);
+void printTokenDict(const TokenDict* dict);
+void printTokens(TokenList list);
+#include <string.h>
 TokenList tokenizeFile(const char* fname, TokenDict* dict);
 
 void freeTokens(TokenList list);

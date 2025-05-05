@@ -1,11 +1,14 @@
+#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include "tokenizer.h"
 
 char** splitArr(const char* str, int* cnt) {
     char* copy = strdup(str);
     int cap = 16;
     *cnt = 0;
-    char** res = malloc(cap * sizeof(char)); 
+    char** res = malloc(cap * sizeof(char*)); 
     //fix ts
 
     char* tok = strtok(copy, ",");
@@ -36,16 +39,12 @@ int main(int argc, char *argv[]) {
     if (argc == 3) {
         int num_reserved;
         char** reserved = splitArr(argv[2], &num_reserved);
-        printf("Num reserved: %d\n", num_reserved);
 
-        for (int i = 0; reserved[i] != NULL; i++) {
-            printf("reserved char at index %d: %c", i, reserved[i][0]);
-        }
-        
+       printf("Num reserved: %d\n", num_reserved);
+
+       
         initTokenDict(&dict, reserved, num_reserved);
         
-        printf("\nToken Dict with the preprocessed stuff:\n");
-        printTokenDict(&dict);
 
 
         for (int i = 0; i < num_reserved; ++i) {
@@ -58,12 +57,15 @@ int main(int argc, char *argv[]) {
 
     TokenList tokens = tokenizeFile(argv[1], &dict);
 
-    printf("Tokens:\n");
+    printf("Non-Reserved Tokens: '");
     printTokens(tokens);
+    printf("'");
 
-    printf("\nToken Map:\n");
+    printf("\nComplete Token Map:\n");
     printTokenDict(&dict);
-
+    char* outname = "tok.json";
+    saveTokenDictAsJSON(&dict, outname);  
+    printf("Saved token dict to '%s'\n", outname);
     freeTokens(tokens);
     freeTokenDict(&dict);
     return 0;
