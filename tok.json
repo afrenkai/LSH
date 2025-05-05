@@ -1,0 +1,17 @@
+{
+  "<bos>": 0,
+  "<eos>": 1,
+  "<unk>": 2,
+  "<pad>": 3,
+  "this": 4,
+  "is": 5,
+  "a": 6,
+  "test": 7,
+  "message": 8,
+  "cant": 9,
+  "wait": 10,
+  "to": 11,
+  "add": 12,
+  "emoji": 13,
+  "support": 14
+}
