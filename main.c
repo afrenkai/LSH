@@ -28,7 +28,7 @@ char** splitArr(const char* str, int* cnt) {
 
 
 int main(int argc, char *argv[]) {
-    if (argc != 2 && argc != 4) {
+    if (argc != 2 && argc != 4 && argc != 3) {
         printf("Usage: %s file.txt [<reserved1>,<reserved2>,... OPTIONAL: name of json]\n", argv[0]);
         return 1;
     }
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     TokenDict dict;
 
 
-    if (argc == 4) {
+    if (argc == 3 || 4) {
         int num_reserved;
         char** reserved = splitArr(argv[2], &num_reserved);
 
@@ -63,7 +63,13 @@ int main(int argc, char *argv[]) {
 
     printf("\nComplete Token Map:\n");
     printTokenDict(&dict);
-    char* outname = argv[3];
+    char* outname;
+    if (argc == 4) {
+     outname = argv[3];
+    }
+    else {
+      outname = "token.json";
+    }
     saveTokenDictAsJSON(&dict, outname);  
     printf("Saved token dict to '%s'\n", outname);
     freeTokens(tokens);
