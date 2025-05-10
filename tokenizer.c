@@ -113,7 +113,7 @@ void printTokens(TokenList list) {
 }
 
 void printTokenDict(const TokenDict* dict) {
-    for (int i = 0; i < dict->size; ++i) {
+     for (int i = 0; i < dict->size; ++i) {
         printf("%s -> %d\n", dict->item[i].tok, dict->item[i].idx);
     }
 }
